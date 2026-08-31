@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — Modern Todo Management</title>
+  <meta name="description" content="A sleek, high-performance task management application built with Flask & MySQL." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
+</head>
+<body>
+  <!-- Ambient background lighting effects -->
+  <div class="ambient-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>TaskFlow</h1>
+          <span class="subtext">Flask & MySQL Powered</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- API Connection Status Badge -->
+        <div id="apiStatusBadge" class="status-badge checking" title="Checking backend connection status">
+          <span class="status-dot"></span>
+          <span id="apiStatusText" class="status-text">Checking API...</span>
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="icon-btn" aria-label="Toggle theme" title="Toggle Light/Dark Theme">
+          <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Analytics Dashboard Card -->
+    <section class="glass-card analytics-card">
+      <div class="analytics-header">
+        <div class="analytics-title">
+          <h2>Progress Overview</h2>
+          <span id="completionPercent" class="percent-badge">0% Complete</span>
+        </div>
+        <div class="progress-bar-track">
+          <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <span class="stat-value" id="statTotal">0</span>
+          <span class="stat-label">Total Tasks</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value active-color" id="statActive">0</span>
+          <span class="stat-label">Active</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value completed-color" id="statCompleted">0</span>
+          <span class="stat-label">Completed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Task Input Form -->
+    <section class="glass-card input-section">
+      <form id="addTodoForm" class="todo-form">
+        <div class="input-wrapper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <input 
+            type="text" 
+            id="todoInput" 
+            class="todo-input" 
+            placeholder="Add a new task... (Press Enter)" 
+            autocomplete="off"
+            required 
+          />
+          <span class="shortcut-hint">Ctrl + N</span>
+        </div>
+        <button type="submit" id="addBtn" class="primary-btn">
+          <span>Add Task</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- Controls Bar: Search, Filters & Bulk Actions -->
+    <section class="controls-bar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search tasks..." autocomplete="off" />
+        <button id="clearSearchBtn" class="clear-search-btn hidden" aria-label="Clear search">✕</button>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs" role="tablist">
+        <button class="filter-btn active" data-filter="all" role="tab">All</button>
+        <button class="filter-btn" data-filter="active" role="tab">Active</button>
+        <button class="filter-btn" data-filter="completed" role="tab">Completed</button>
+      </div>
+
+      <!-- Bulk Actions Menu -->
+      <div class="bulk-actions">
+        <button id="markAllBtn" class="secondary-btn" title="Mark all items as completed">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Mark All</span>
+        </button>
+        <button id="clearCompletedBtn" class="secondary-btn danger-hover" title="Clear completed items">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Clear Done</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Task List Container -->
+    <main class="todo-list-container">
+      <ul id="todoList" class="todo-list">
+        <!-- Rendered dynamically via JS -->
+      </ul>
+
+      <!-- Empty State View -->
+      <div id="emptyState" class="empty-state glass-card hidden">
+        <div class="empty-icon">✨</div>
+        <h3 id="emptyTitle">No tasks found</h3>
+        <p id="emptyMessage">Get started by creating your first task above!</p>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>TaskFlow &bull; Powered by Flask, MySQL & Docker &bull; Double click task to edit</p>
+    </footer>
+  </div>
+
+  <!-- Toast Notification Stack Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

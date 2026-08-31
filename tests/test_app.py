@@ -76,3 +76,27 @@ def test_delete_todo(client):
 
     assert response.status_code == 200
     assert response.json["message"] == "Todo deleted"
+
+
+def test_index_page(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"TaskFlow" in response.data
+
+
+def test_update_todo(client):
+    create_response = client.post(
+        "/todos",
+        json={"title": "Original Title"}
+    )
+    todo_id = create_response.json["id"]
+
+    response = client.put(
+        f"/todos/{todo_id}",
+        json={"title": "Updated Title", "completed": True}
+    )
+
+    assert response.status_code == 200
+    assert response.json["title"] == "Updated Title"
+    assert response.json["completed"] is True
+

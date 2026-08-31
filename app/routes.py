@@ -1,10 +1,15 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, render_template, request
 
 from app import db
 from app.models import Todo
 
 
 main = Blueprint("main", __name__)
+
+
+@main.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
 
 
 @main.route("/health", methods=["GET"])

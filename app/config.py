@@ -6,7 +6,7 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
-        "mysql+pymysql://todo_user:password@localhost/todo_db"
+        "sqlite:///todo.db"
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
