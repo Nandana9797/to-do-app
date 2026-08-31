@@ -99,4 +99,3 @@ def test_update_todo(client):
     assert response.status_code == 200
     assert response.json["title"] == "Updated Title"
     assert response.json["completed"] is True
-

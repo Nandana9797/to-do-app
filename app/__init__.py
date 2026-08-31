@@ -11,7 +11,7 @@ def create_app():
 
     logging.basicConfig(
         level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s %(message)s"
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
 
     app.config.from_object("app.config.Config")
@@ -19,13 +19,18 @@ def create_app():
     db.init_app(app)
 
     from app.routes import main
+
     app.register_blueprint(main)
 
     @app.after_request
     def add_cors_headers(response):
         response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type, Authorization"
+        )
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST, PUT, DELETE, OPTIONS"
+        )
         return response
 
     return app
